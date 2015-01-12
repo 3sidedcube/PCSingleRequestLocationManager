@@ -8,8 +8,6 @@
 
 #import "PCSingleRequestLocationManager.h"
 #import <CoreLocation/CoreLocation.h>
-#import "NSString+LocalisedString.h"
-#import "TSCAlertViewController.h"
 
 #define kPCWebServiceLocationManagerDebug NO
 #define kPCWebServiceLocationManagerMaxWaitTime 10.0
@@ -55,6 +53,11 @@
 
 - (void)requestCurrentLocationWithCompletion:(PCSingleRequestLocationCompletion)completion
 {
+    [self requestCurrentLocationWithAuthorizationType:PCAuthorizationTypeWhenInUse completion:completion];
+}
+
+- (void)requestCurrentLocationWithAuthorizationType:(PCAuthorizationType)authorization completion:(PCSingleRequestLocationCompletion)completion
+{
     //Copy completion block for firing later
     self.PCSingleRequestLocationCompletion = completion;
     
@@ -80,7 +83,7 @@
     
     if (status == kCLAuthorizationStatusDenied || status == kCLAuthorizationStatusRestricted) {
         
-        NSError *error = [NSError errorWithDomain:@"org.threesidedcube.requestmanager" code:1001 userInfo:@{NSLocalizedDescriptionKey: [NSString stringWithLocalisationKey:@"_HOSPITALFINDER_ALERT_LOCATIONDISABLED_MESSAGE" fallbackString:@"Sorry, it looks like your have location permissions disabled. Please visit settings to allow"]}];
+        NSError *error = [NSError errorWithDomain:@"org.threesidedcube.requestmanager" code:1001 userInfo:@{NSLocalizedDescriptionKey: TSCLanguageString(@"_LOCATIONREQUEST_ALERT_LOCATIONDISABLED_MESSAGE")}];
         self.PCSingleRequestLocationCompletion(nil, error);
         [self cleanUp];
         
