@@ -63,7 +63,16 @@
     
     // Start location manager
     if ([self.locationManager respondsToSelector:@selector(requestAlwaysAuthorization)] && [CLLocationManager authorizationStatus] != kCLAuthorizationStatusAuthorizedAlways && [CLLocationManager authorizationStatus] != kCLAuthorizationStatusAuthorizedWhenInUse) {
-        [self.locationManager requestWhenInUseAuthorization];
+        
+        if(authorization == PCAuthorizationTypeAlways) {
+            
+            [self.locationManager requestAlwaysAuthorization];
+            
+        } else if(authorization == PCAuthorizationTypeWhenInUse) {
+            
+            [self.locationManager requestWhenInUseAuthorization];
+            
+        }
     } else {
         [self.locationManager startUpdatingLocation];
     }
