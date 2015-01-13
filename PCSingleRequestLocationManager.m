@@ -67,19 +67,17 @@
         if(authorization == PCAuthorizationTypeAlways) {
             
             [self.locationManager requestAlwaysAuthorization];
-            
         } else if(authorization == PCAuthorizationTypeWhenInUse) {
             
             [self.locationManager requestWhenInUseAuthorization];
-            
         }
     } else {
+        
         [self.locationManager startUpdatingLocation];
+        // Start timers - If user hasn't enabled permissions yet we need to wait until they have allowed/disallowed location updates before starting these timers.
+        _maxWaitTimeTimer = [NSTimer scheduledTimerWithTimeInterval:kPCWebServiceLocationManagerMaxWaitTime target:self selector:@selector(maxWaitTimeReached) userInfo:nil repeats:NO];
+        _minWaitTimeTimer = [NSTimer scheduledTimerWithTimeInterval:kPCWebServiceLocationManagerMinWaitTime target:self selector:@selector(minWaitTimeReached) userInfo:nil repeats:NO];
     }
-    
-    // Start timers
-    _maxWaitTimeTimer = [NSTimer scheduledTimerWithTimeInterval:kPCWebServiceLocationManagerMaxWaitTime target:self selector:@selector(maxWaitTimeReached) userInfo:nil repeats:NO];
-    _minWaitTimeTimer = [NSTimer scheduledTimerWithTimeInterval:kPCWebServiceLocationManagerMinWaitTime target:self selector:@selector(minWaitTimeReached) userInfo:nil repeats:NO];
 }
 
 #pragma mark CLLocationManager delegate
@@ -87,7 +85,12 @@
 - (void)locationManager:(CLLocationManager *)manager didChangeAuthorizationStatus:(CLAuthorizationStatus)status
 {
     if (status == kCLAuthorizationStatusAuthorizedAlways || status == kCLAuthorizationStatusAuthorizedWhenInUse) {
+        
         [self.locationManager startUpdatingLocation];
+        
+        // Start timers
+        _maxWaitTimeTimer = [NSTimer scheduledTimerWithTimeInterval:kPCWebServiceLocationManagerMaxWaitTime target:self selector:@selector(maxWaitTimeReached) userInfo:nil repeats:NO];
+        _minWaitTimeTimer = [NSTimer scheduledTimerWithTimeInterval:kPCWebServiceLocationManagerMinWaitTime target:self selector:@selector(minWaitTimeReached) userInfo:nil repeats:NO];
     }
     
     if (status == kCLAuthorizationStatusDenied || status == kCLAuthorizationStatusRestricted) {
