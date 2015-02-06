@@ -95,7 +95,7 @@
     
     if (status == kCLAuthorizationStatusDenied || status == kCLAuthorizationStatusRestricted) {
         
-        NSError *error = [NSError errorWithDomain:@"org.threesidedcube.requestmanager" code:1001 userInfo:@{NSLocalizedDescriptionKey: TSCLanguageString(@"_LOCATIONREQUEST_ALERT_LOCATIONDISABLED_MESSAGE")}];
+        NSError *error = [NSError errorWithDomain:@"org.threesidedcube.requestmanager" code:1001 userInfo:@{NSLocalizedDescriptionKey: @"_LOCATIONREQUEST_ALERT_LOCATIONDISABLED_MESSAGE"}];
         self.PCSingleRequestLocationCompletion(nil, error);
         [self cleanUp];
         
