@@ -29,12 +29,6 @@
 
 @implementation PCSingleRequestLocationManager
 
-- (void)dealloc
-{
-    self.locationManager.delegate = nil;
-    self.locationManager = nil;
-}
-
 /**
  Creates new instance of PCSingleRequestLocationManager.
  */
@@ -46,7 +40,6 @@
         self.locationManager = [[CLLocationManager alloc] init];
         self.locationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters;
         self.locationManager.delegate = self;
-        
     }
     return self;
 }
@@ -62,7 +55,7 @@
     self.PCSingleRequestLocationCompletion = completion;
     
     // Start location manager
-    if ([self.locationManager respondsToSelector:@selector(requestAlwaysAuthorization)] && [CLLocationManager authorizationStatus] != kCLAuthorizationStatusAuthorizedAlways && [CLLocationManager authorizationStatus] != kCLAuthorizationStatusAuthorizedWhenInUse) {
+    if ([self.locationManager respondsToSelector:@selector(requestAlwaysAuthorization)] && [CLLocationManager authorizationStatus] != kCLAuthorizationStatusAuthorizedAlways && [CLLocationManager authorizationStatus] != kCLAuthorizationStatusAuthorizedWhenInUse && [CLLocationManager authorizationStatus] != kCLAuthorizationStatusAuthorized) {
         
         if(authorization == PCAuthorizationTypeAlways) {
             
@@ -98,7 +91,6 @@
         NSError *error = [NSError errorWithDomain:@"org.threesidedcube.requestmanager" code:1001 userInfo:@{NSLocalizedDescriptionKey: @"_LOCATIONREQUEST_ALERT_LOCATIONDISABLED_MESSAGE"}];
         self.PCSingleRequestLocationCompletion(nil, error);
         [self cleanUp];
-        
     }
 }
 
@@ -194,6 +186,7 @@
 - (void)cleanUp
 {
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        
         [self.locationManager stopUpdatingLocation];
         [_maxWaitTimeTimer invalidate];
         [_minWaitTimeTimer invalidate];
