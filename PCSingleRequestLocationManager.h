@@ -9,14 +9,15 @@
 #import <Foundation/Foundation.h>
 
 @class CLLocation;
-@class PCSingleRequestLocationManager;
 
-@interface PCSingleRequestLocationManager : NSObject
 
 typedef NS_ENUM(NSInteger, PCAuthorizationType) {
     PCAuthorizationTypeWhenInUse = 1,
     PCAuthorizationTypeAlways = 2
 };
+
+@interface PCSingleRequestLocationManager : NSObject
+
 
 typedef void (^PCSingleRequestLocationCompletion)(CLLocation *location, NSError *error);
 
