@@ -202,9 +202,12 @@
         
         [self.locationManager stopUpdatingLocation];
         [_maxWaitTimeTimer invalidate];
+        _maxWaitTimeTimer = nil;
         [_minWaitTimeTimer invalidate];
+        _minWaitTimeTimer = nil;
         _maxWaitTimeReached = NO;
         _minWaitTimeReached = NO;
+        self.PCSingleRequestLocationCompletion = nil;
     }];
     
 }
