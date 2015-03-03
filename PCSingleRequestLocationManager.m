@@ -29,25 +29,23 @@
 
 @implementation PCSingleRequestLocationManager
 
+static PCSingleRequestLocationManager *sharedLocationManager = nil;
+
 - (void)dealloc
 {
     self.locationManager.delegate = nil;
     self.locationManager = nil;
 }
 
-/**
- Creates new instance of PCSingleRequestLocationManager.
- */
-- (id)init
++ (PCSingleRequestLocationManager *)sharedLocationManager
 {
-    self = [super init];
-    if (self){
-        
-        self.locationManager = [[CLLocationManager alloc] init];
-        self.locationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters;
-        self.locationManager.delegate = self;
+    @synchronized(self) {
+        if (sharedLocationManager == nil) {
+            sharedLocationManager = [self new];
+        }
     }
-    return self;
+    
+    return sharedLocationManager;
 }
 
 - (void)requestCurrentLocationWithCompletion:(PCSingleRequestLocationCompletion)completion
@@ -57,6 +55,10 @@
 
 - (void)requestCurrentLocationWithAuthorizationType:(PCAuthorizationType)authorization completion:(PCSingleRequestLocationCompletion)completion
 {
+    self.locationManager = [[CLLocationManager alloc] init];
+    self.locationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters;
+    self.locationManager.delegate = self;
+    
     //Copy completion block for firing later
     self.PCSingleRequestLocationCompletion = completion;
     
@@ -190,7 +192,9 @@
     // Location settled upon!
     _locationSettledUpon = YES;
     
-    self.PCSingleRequestLocationCompletion(self.locationManager.location, nil);
+    if (self.PCSingleRequestLocationCompletion) {
+        self.PCSingleRequestLocationCompletion(self.locationManager.location, nil);
+    }
     
     [self cleanUp];
     
@@ -201,12 +205,16 @@
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
         
         [self.locationManager stopUpdatingLocation];
+        
+        self.locationManager.delegate = nil;
+        self.locationManager = nil;
         [_maxWaitTimeTimer invalidate];
         _maxWaitTimeTimer = nil;
         [_minWaitTimeTimer invalidate];
         _minWaitTimeTimer = nil;
         _maxWaitTimeReached = NO;
         _minWaitTimeReached = NO;
+        _locationSettledUpon = NO;
         self.PCSingleRequestLocationCompletion = nil;
     }];
     
