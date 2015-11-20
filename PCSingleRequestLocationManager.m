@@ -96,6 +96,12 @@ static PCSingleRequestLocationManager *sharedLocationManager = nil;
         
         if (self.PCSingleRequestLocationCompletion) { // Only start up if a user has actually requested location by now
             
+            if ([self.locationManager respondsToSelector:@selector(requestLocation)]) {
+                
+                [self.locationManager requestLocation];
+                return;
+            }
+            
             [self.locationManager startUpdatingLocation];
             // Start timers
             _maxWaitTimeTimer = [NSTimer scheduledTimerWithTimeInterval:kPCWebServiceLocationManagerMaxWaitTime target:self selector:@selector(maxWaitTimeReached) userInfo:nil repeats:NO];
